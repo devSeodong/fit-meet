@@ -1,0 +1,17 @@
+# 기본적으로 텍스트 파일은 OS에 맞게 자동 변환 (전부 안전)
+* text=auto
+
+# Shell Script, Mac/Linux 실행 파일은 LF 강제
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows 배치파일은 CRLF 강제
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Markdown, YAML, JSON 등은 LF 강제 (선호도 따라 LF 고정)
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+

@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: FitMeet
+
+  thymeleaf:
+    mode: HTML
+    suffix: .html
+    prefix: classpath:templates/
+    check-template-location: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/fitmeet?useSSL=false&serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
+    username: seodong
+    password: Tjgud990517!
+
+  mybatis:
+    type-aliases-package: com.ssafy.fitmeet.model.dto
+    mapper-locations: classpath:mappers/**/*.xml
+    configuration:
+      map-underscore-to-camel-case: true
+      cache-enabled: false
+      jdbc-type-for-null: 'NULL'
+
+  web:
+    resources:
+      static-locations: /static/
+
+server:
+  port: 80
+
+jwt:
+  secret: ""
+  access-token-validity-in-ms: 3600000
+
+logging:
+  level:
+    root: INFO
+    com.ssafy.fitmeet: DEBUG
+

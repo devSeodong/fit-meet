@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.user.dao.UserBodyInfoDao">
+
+    <sql id="BodyColumns">
+        id,
+        user_id,
+        height_cm,
+        weight_kg,
+        target_weight_kg,
+        gender,
+        birth_date,
+        activity_level,
+        created_at,
+        updated_at
+    </sql>
+
+    <select id="findByUserId" resultType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo">
+        SELECT <include refid="BodyColumns"/>
+        FROM user_body_info
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertBodyInfo"
+            parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_body_info (
+            user_id, height_cm, weight_kg,
+            target_weight_kg, gender, birth_date,
+            activity_level, created_at, updated_at
+        ) VALUES (
+            #{userId}, #{heightCm}, #{weightKg},
+            #{targetWeightKg}, #{gender}, #{birthDate},
+            #{activityLevel}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateBodyInfo" parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo">
+        UPDATE user_body_info
+        SET height_cm = #{heightCm},
+            weight_kg = #{weightKg},
+            target_weight_kg = #{targetWeightKg},
+            gender = #{gender},
+            birth_date = #{birthDate},
+            activity_level = #{activityLevel},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

@@ -1,0 +1,81 @@
+###########################################
+# Build / Packaging
+###########################################
+target/
+build/
+out/
+*.class
+
+# Maven Wrapper JAR
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+###########################################
+# IDE - STS/Eclipse
+###########################################
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
+
+###########################################
+# IDE - IntelliJ IDEA
+###########################################
+.idea/
+*.iws
+*.iml
+*.ipr
+
+###########################################
+# VS Code
+###########################################
+.vscode/
+
+###########################################
+# NetBeans
+###########################################
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+###########################################
+# OS Files
+###########################################
+.DS_Store
+Thumbs.db
+
+###########################################
+# Logs
+###########################################
+*.log
+
+###########################################
+# Application Properties (민감정보)
+###########################################
+application-local.properties
+application-local.yml
+application-dev.properties
+application-dev.yml
+
+###########################################
+# Database Files
+###########################################
+db-data/
+mysql-data/
+h2-data/
+*.db
+*.mv.db
+*.sqlite
+
+###########################################
+# Temporary / Cache
+###########################################
+*.tmp
+*.cache
+*.swp
+*.swo

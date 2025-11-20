@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.user.dao.UserDao">
+
+    <sql id="UserColumns">
+        id,
+        email,
+        password,
+        name,
+        nickname,
+        status,
+        role,
+        profile_image_url,
+        email_verified,
+        last_login_at,
+        password_changed_at,
+        created_at,
+        updated_at,
+        deleted_at
+    </sql>
+
+    <select id="findByEmail" resultType="com.ssafy.fitmeet.domain.user.entity.User">
+        SELECT <include refid="UserColumns"/>
+        FROM `user`
+        WHERE email = #{email}
+        AND deleted_at IS NULL
+    </select>
+
+    <select id="findById" resultType="com.ssafy.fitmeet.domain.user.entity.User">
+        SELECT <include refid="UserColumns"/>
+        FROM `user`
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <insert id="insertUser"
+            parameterType="com.ssafy.fitmeet.domain.user.entity.User"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `user` (
+            email, password, name, nickname,
+            status, role, profile_image_url,
+            email_verified, last_login_at, password_changed_at,
+            created_at, updated_at, deleted_at
+        ) VALUES (
+                     #{email}, #{password}, #{name}, #{nickname},
+                     #{status}, #{role}, #{profileImageUrl},
+                     #{emailVerified}, #{lastLoginAt}, #{passwordChangedAt},
+                     NOW(), NOW(), NULL
+                 )
+    </insert>
+
+    <update id="updateLastLogin">
+        UPDATE `user`
+        SET last_login_at = #{lastLoginAt},
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="updatePassword">
+        UPDATE `user`
+        SET password = #{password},
+            password_changed_at = #{passwordChangedAt},
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="softDelete">
+        UPDATE `user`
+        SET status = #{status},
+            deleted_at = #{deletedAt},
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+</mapper>
