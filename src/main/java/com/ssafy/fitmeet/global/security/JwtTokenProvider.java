@@ -20,6 +20,9 @@ public class JwtTokenProvider {
 
     @Value("${jwt.access-token-validity-in-ms:3600000}")
     private long accessTokenValidityInMs;
+    
+    @Value("${jwt.refresh-token-validity-in-ms:1209600000}")
+    private long refreshTokenValidityInMs;
 
     private Key key;
 
@@ -37,6 +40,21 @@ public class JwtTokenProvider {
     public String createAccessToken(String email, String role) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", role);
+
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+    
+    public String createRefreshToken(String email) {
+    	Claims claims = Jwts.claims().setSubject(email);
+        claims.put("type", "refresh");
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
@@ -71,5 +89,13 @@ public class JwtTokenProvider {
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
+    }
+    
+    public long getAccessTokenValidityInMs() {
+        return accessTokenValidityInMs;
+    }
+
+    public long getRefreshTokenValidityInMs() {
+        return refreshTokenValidityInMs;
     }
 }

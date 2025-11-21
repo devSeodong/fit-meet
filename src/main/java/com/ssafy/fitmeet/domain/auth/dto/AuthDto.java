@@ -17,6 +17,7 @@ public class AuthDto {
     // 로그인 응답
     public record LoginResponse(
             String accessToken,
+            String refreshToken,
             String tokenType,
             LocalDateTime issuedAt,
             LocalDateTime expiresAt
@@ -35,4 +36,5 @@ public class AuthDto {
             LocalDate birthDate,
             String activityLevel
     ) {}
+    
 }

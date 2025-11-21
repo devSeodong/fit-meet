@@ -52,7 +52,7 @@ public class AuthService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        userDao.insertUser(user); // useGeneratedKeys 로 id 채워짐
+        userDao.insertUser(user);
 
         // 신체 정보 저장
         UserBodyInfo bodyInfo = UserBodyInfo.builder()
@@ -94,13 +94,31 @@ public class AuthService {
                 .orElse("ROLE_USER");
 
         // 토큰 생성
-        String token = jwtTokenProvider.createAccessToken(principal.getUsername(), role);
+        String accessToken = jwtTokenProvider.createAccessToken(principal.getUsername(), role);
+        String refreshToken = jwtTokenProvider.createRefreshToken(principal.getUsername());
 
         return new LoginResponse(
-                token,
+        		accessToken,
+        		refreshToken,
                 "Bearer",
                 LocalDateTime.now(),
-                null // 만료 시간은 옵션: JwtTokenProvider에서 계산해서 주고 싶으면 필드/메서드 추가
+                null
         );
     }
+    
+    /**
+     * 리프레시 메서드
+     */
+    public String regenerateAccessTokenByRefreshToken(String refreshToken) {
+    	if(!jwtTokenProvider.validateToken(refreshToken)) {
+    		throw new IllegalArgumentException("리프레시 토큰이 유효하지 않습니다.");
+    	}
+    	
+    	String email = jwtTokenProvider.getEmail(refreshToken);
+    	
+    	// DB 저장? => user_refresh_token 테이블
+    	
+    	
+    }
+    
 }

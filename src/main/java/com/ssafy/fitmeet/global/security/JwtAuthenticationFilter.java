@@ -2,9 +2,11 @@ package com.ssafy.fitmeet.global.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,6 +58,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String bearer = request.getHeader("Authorization");
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
+        }
+        
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+        	for (Cookie cookie : cookies) {
+                if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

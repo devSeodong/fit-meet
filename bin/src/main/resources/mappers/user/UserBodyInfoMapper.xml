@@ -18,14 +18,14 @@
         updated_at
     </sql>
 
-<!--  -->
     <select id="findByUserId" resultType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo">
         SELECT <include refid="BodyColumns"/>
         FROM user_body_info
         WHERE user_id = #{userId}
     </select>
 
-    <insert id="insertBodyInfo" parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo"
+    <insert id="insertBodyInfo"
+            parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user_body_info (
             user_id, height_cm, weight_kg,

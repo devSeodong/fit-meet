@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.auth.dao.UserRefreshTokenDao">
+
+    <resultMap id="UserRefreshTokenMap" type="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken"></resultMap>
+
+    <select id="findByUserId" resultMap="UserRefreshTokenMap">
+        SELECT
+            user_id,
+            refresh_token,
+            expires_at,
+            created_at,
+            updated_at
+        FROM user_refresh_token
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken">
+        INSERT INTO user_refresh_token (
+            user_id,
+            refresh_token,
+            expires_at,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{userId},
+            #{refreshToken},
+            #{expiresAt},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken">
+        UPDATE user_refresh_token
+        SET
+            refresh_token = #{refreshToken},
+            expires_at    = #{expiresAt},
+            updated_at    = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_refresh_token
+        WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

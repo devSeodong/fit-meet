@@ -22,7 +22,6 @@
         deleted_at
     </sql>
 
-	<!-- 이메일 사용자 조회 ( 로그인, 이메일 중복 체크 ) -->
     <select id="findByEmail" resultType="com.ssafy.fitmeet.domain.user.entity.User">
         SELECT <include refid="UserColumns"/>
         FROM `user`
@@ -30,7 +29,6 @@
         AND deleted_at IS NULL
     </select>
 
-	<!-- ID로 사용자 단건 조회 -->
     <select id="findById" resultType="com.ssafy.fitmeet.domain.user.entity.User">
         SELECT <include refid="UserColumns"/>
         FROM `user`
@@ -38,7 +36,6 @@
         AND deleted_at IS NULL
     </select>
 
-	<!-- 신규회원등록 -->
     <insert id="insertUser"
             parameterType="com.ssafy.fitmeet.domain.user.entity.User"
             useGeneratedKeys="true" keyProperty="id">
@@ -55,7 +52,6 @@
                  )
     </insert>
 
-	<!-- 마지막 로그인시간 -->
     <update id="updateLastLogin">
         UPDATE `user`
         SET last_login_at = #{lastLoginAt},
@@ -64,7 +60,6 @@
           AND deleted_at IS NULL
     </update>
 
-	<!-- 비밀번호 변경 + 변경시간 업데이트 -->
     <update id="updatePassword">
         UPDATE `user`
         SET password = #{password},
@@ -74,7 +69,6 @@
           AND deleted_at IS NULL
     </update>
 
-	<!-- 회원 탈퇴 ( 소프트 딜리트 ) -->
     <update id="softDelete">
         UPDATE `user`
         SET status = #{status},

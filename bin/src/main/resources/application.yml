@@ -11,8 +11,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/fitmeet?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: ssafy
+    username: seodong
+    password: Tjgud990517!
 
   web:
     resources:
@@ -38,12 +38,6 @@ server:
 jwt:
   secret: "fitmeettsttestesttest1235test54345346testestestestestest"
   access-token-validity-in-ms: 3600000
-  refresh-token-validity-in-ms: 1209600000
-  
-open-api:
-  nutri : 
-    end-point : "https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02/getFoodNtrCpntDbInq02"
-    key : "r5iww18IGLqktX1nmaQWV6s90R0aenR%2Fwf9cFRgFPyvlonWWZftRaz8MZDUrlhzluQ89dgNpaVwQN%2F%2BNRVvGqA%3D%3D"
 
 logging:
   level:
