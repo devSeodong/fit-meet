@@ -67,6 +67,20 @@ CREATE TABLE `password_reset_token` (
 )
 ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+-- 리프레시 토큰 저장 테이블
+CREATE TABLE `user_refresh_token` (
+    `user_id`      BIGINT UNSIGNED NOT NULL, -- USER.id (FK)
+    `refresh_token` VARCHAR(512) NOT NULL, -- 리프레시 토큰 문자열 (JWT)
+    `expires_at`    DATETIME NOT NULL, -- 리프레시 토큰 만료 시각
+    `created_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`user_id`),
+    CONSTRAINT `fk_urt_user`
+        FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+select * 
+from user u join user_body_info ub
+where u.id = ub.id;
 
 
