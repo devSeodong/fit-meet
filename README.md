@@ -86,11 +86,6 @@ public class UserController {
         summary = "회원 가입",
         description = "이메일, 비밀번호, 이름을 받아 신규 사용자를 생성합니다."
     )
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "회원 가입 성공"),
-        @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 데이터"),
-        @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일")
-    })
     @PostMapping
     public ResponseEntity<UserResponseDto> signUp(
         @RequestBody UserSignUpRequestDto request
@@ -110,11 +105,6 @@ public class UserController {
 
   * `summary`: API 한 줄 요약
   * `description`: 세부 설명
-
-* `@ApiResponses`
-
-  * 성공/오류 응답 코드 상세히 작성
-  * 프론트 개발 시 큰 도움이 됨
 
 > 새로운 REST API 작성 시 필수 순서
 > **Controller 메서드 생성 → Swagger 어노테이션 작성 → Commit**
