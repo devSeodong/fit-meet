@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "인증 관련 API (회원가입, 로그인 등)")
-public class AuthController {
+@Log4j2
+public class AuthRestController {
 
 	private final AuthService authService;
 
@@ -48,11 +50,21 @@ public class AuthController {
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
 		LoginResponse loginRes = authService.login(request);
 
-		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", loginRes.accessToken()).httpOnly(true)
-				.path("/").maxAge(1800).sameSite("Lax").build();
+		ResponseCookie accessCookie = ResponseCookie
+				.from("ACCESS_TOKEN", loginRes.accessToken())
+				.httpOnly(true)
+				.path("/")
+				.maxAge(1800)
+				.sameSite("Lax")
+				.build();
 
-		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", loginRes.refreshToken()).httpOnly(true)
-				.path("/api/auth").maxAge(1209600).sameSite("Lax").build();
+		ResponseCookie refreshCookie = ResponseCookie
+				.from("REFRESH_TOKEN", loginRes.refreshToken())
+				.httpOnly(true)
+				.path("/api/auth")
+				.maxAge(1209600)
+				.sameSite("Lax")
+				.build();
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
@@ -66,12 +78,13 @@ public class AuthController {
 	 */
 	@PostMapping("/refresh")
 	@Operation(summary = "새로고침", description = "")
-	public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<String> refresh(HttpServletRequest request, HttpServletResponse response) {
 
 		String refreshToken = null;
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
+				log.info("쿠키 확인 : {}", cookie.getValue());
 				if ("REFRESH_TOKEN".equals(cookie.getName())) {
 					refreshToken = cookie.getValue();
 					break;
@@ -80,7 +93,7 @@ public class AuthController {
 		}
 
 		if (refreshToken == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 업슴 ㅠㅠ ");
 		}
 
 		String newAccessToken = authService.regenerateAccessTokenByRefreshToken(refreshToken);
@@ -95,7 +108,7 @@ public class AuthController {
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().body("새로고침 완료 !");
 	}
 	
 	/**
@@ -103,12 +116,12 @@ public class AuthController {
 	 */
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃")
-	public ResponseEntity<Void> logout(HttpServletResponse response) {
+	public ResponseEntity<String> logout(HttpServletResponse response) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.isAuthenticated()) {
 			String email = auth.getName();
-			authService.logout(email); //
+			authService.logout(email); 
 		}
 
 		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", "")
@@ -128,6 +141,6 @@ public class AuthController {
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().body("로그아웃 완료 !");
 	}
 }

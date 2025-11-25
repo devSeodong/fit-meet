@@ -11,8 +11,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/fitmeet?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=UTF-8
-    username: seodong
-    password: Tjgud990517!
+    username: root
+    password: ssafy
 
   web:
     resources:

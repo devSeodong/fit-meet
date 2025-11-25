@@ -6,6 +6,9 @@ import com.ssafy.fitmeet.domain.user.dto.UserDto.ChangePasswordRequest;
 import com.ssafy.fitmeet.domain.user.dto.UserDto.UpdateProfileRequest;
 import com.ssafy.fitmeet.domain.user.entity.User;
 import com.ssafy.fitmeet.domain.user.entity.UserBodyInfo;
+import com.ssafy.fitmeet.global.error.CustomException;
+import com.ssafy.fitmeet.global.error.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +30,19 @@ public class UserService {
     /**
      * 현재 로그인한 유저의 email 가져오기
      */
-    private String getCurrentUserEmail() {
+    public String getCurrentUserEmail() {
         return SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
+    }
+    
+    /**
+     * 이메일 사용자 조회 ( 로그인, 이메일 중복 체크 )
+     */
+    public User getUserInfoEmail(String email) {
+    	User user = userDao.findByEmail(email);
+    	if(user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    	return user;
     }
 
     /**
@@ -39,7 +52,7 @@ public class UserService {
     public void updateProfile(UpdateProfileRequest request) {
         String email = getCurrentUserEmail();
         User user = userDao.findByEmail(email);
-        if (user == null) throw new IllegalStateException("유저를 찾을 수 없습니다.");
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
         // 닉네임 변경
         user.setNickname(request.nickname());
@@ -80,11 +93,11 @@ public class UserService {
     public void changePassword(ChangePasswordRequest request) {
         String email = getCurrentUserEmail();
         User user = userDao.findByEmail(email);
-        if (user == null) throw new IllegalStateException("유저를 찾을 수 없습니다.");
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
         // 현재 비밀번호 검증
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
-            throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.AUTH_BAD_CREDENTIALS);
         }
 
         String encoded = passwordEncoder.encode(request.newPassword());
@@ -98,7 +111,7 @@ public class UserService {
     public void withdraw() {
         String email = getCurrentUserEmail();
         User user = userDao.findByEmail(email);
-        if (user == null) throw new IllegalStateException("유저를 찾을 수 없습니다.");
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
         userDao.softDelete(user.getId(), "WITHDRAWN", LocalDateTime.now());
     }

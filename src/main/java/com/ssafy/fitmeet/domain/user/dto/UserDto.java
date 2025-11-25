@@ -22,5 +22,4 @@ public class UserDto {
             String newPassword
     ) {}
     
-
 }

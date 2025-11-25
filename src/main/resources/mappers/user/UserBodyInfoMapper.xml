@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ssafy.fitmeet.domain.user.dao.UserBodyInfoDao">
 
@@ -19,13 +19,13 @@
     </sql>
 
 <!--  -->
-    <select id="findByUserId" resultType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo">
+    <select id="findByUserId" resultType="UserBodyInfo">
         SELECT <include refid="BodyColumns"/>
         FROM user_body_info
         WHERE user_id = #{userId}
     </select>
 
-    <insert id="insertBodyInfo" parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo"
+    <insert id="insertBodyInfo" parameterType="UserBodyInfo"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user_body_info (
             user_id, height_cm, weight_kg,
@@ -38,7 +38,7 @@
         )
     </insert>
 
-    <update id="updateBodyInfo" parameterType="com.ssafy.fitmeet.domain.user.entity.UserBodyInfo">
+    <update id="updateBodyInfo" parameterType="UserBodyInfo">
         UPDATE user_body_info
         SET height_cm = #{heightCm},
             weight_kg = #{weightKg},
