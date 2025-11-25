@@ -111,9 +111,119 @@ public class UserController {
 
 ---
 
+# 📦 4️⃣ 공통 Response 규칙 (API 응답 통일)
+
+FitMeet의 모든 REST API 응답은 아래 **단일 Response 포맷**을 사용합니다.
+프론트는 항상 동일한 형식으로 응답을 받을 수 있으며,
+성공/실패 여부는 `code`로 구분합니다.
+
+---
+
+## ✅ Response 공통 구조
+
+```json
+{
+  "code": 0,
+  "msg": "SUCCESS",
+  "data": { ... }
+}
+```
+
+### ✔ 필드 설명
+
+| 필드명         | 설명                                    |
+| ----------- | ------------------------------------- |
+| `code`  | 0 = 성공<br>그 외 = ErrorCode에서 정의한 에러 코드 |
+| `msg` | 성공/실패 메시지                             |
+| `data`      | 실제 데이터 (실패 시 null)                    |
+
+---
+
+## 🟢 성공 응답 예시
+
+```json
+{
+  "code": 0,
+  "msg": "SUCCESS",
+  "data": {
+    "id": 1,
+    "email": "test@test.com",
+    "name": "김서형"
+  }
+}
+```
+
+---
+
+## 🔴 실패(에러) 응답 예시
+
+예: 존재하지 않는 이메일로 조회한 경우
+
+```json
+{
+  "code": 2001,
+  "msg": "유저를 찾을 수 없습니다.",
+  "data": null
+}
+```
+
+예: JWT 토큰 만료
+
+```json
+{
+  "code": 1002,
+  "msg": "만료된 토큰입니다.",
+  "data": null
+}
+```
+
+예: DB 중복키 (이메일 중복 등)
+
+```json
+{
+  "code": 8001,
+  "msg": "이미 존재하는 데이터입니다.",
+  "data": null
+}
+```
+
+---
+
+## 🧩 ErrorCode 규칙 (code 체계)
+
+| 구분               | 코드 범위         | 설명               |
+| ---------------- | ------------- | ---------------- |
+| 성공               | `0`           | 정상 처리            |
+| 인증/인가            | `1000 ~ 1999` | JWT 오류, 로그인 오류 등 |
+| 유저 도메인           | `2000 ~ 2999` | 회원 관련 오류         |
+| 기타 도메인(식단/챌린지 등) | `3000 ~ 3999` | 필요 시 추가          |
+| DB 제약 오류         | `8000 ~ 8999` | DuplicateKey 등   |
+| 서버 오류            | `9000 ~ 9999` | 예상치 못한 내부 오류     |
+
+> 상세 코드는 `/global/error/ErrorCode.java` 참고
+
+---
+
+## ⚙️ GlobalExceptionHandler
+
+모든 예외는 프로젝트 공통 `GlobalExceptionHandler` 에서 처리되며,
+ErrorCode 기반의 통일된 Response 구조로 변환됩니다.
+
+핸들링되는 주요 예외:
+
+* `CustomException` (비즈니스 예외)
+* `ExpiredJwtException` / `JwtException`
+* `DuplicateKeyException` (DB 중복)
+* `BadCredentialsException` (로그인 실패)
+* `AccessDeniedException` (권한 없음)
+* 기타 모든 예외
+  
+---
+
 ## 🔚 마무리
 
 * **컨벤션 통일**
 * **main 브랜치 규칙 준수**
 * **Swagger로 문서화**
+* **공통 Response 규칙 (API 응답 통일)**
 
