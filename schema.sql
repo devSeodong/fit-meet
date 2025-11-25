@@ -79,8 +79,22 @@ CREATE TABLE `user_refresh_token` (
         FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+------------------------------------------------------------------------------------
+
+-- 식단 기본 테이블
+DROP TABLE IF EXISTS `diet`;
+CREATE TABLE `diet` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 (PK)
+    PRIMARY KEY (`id`)
+) 
+ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 select * 
 from user u join user_body_info ub
 where u.id = ub.id;
+
+select * from user_body_info;
+select * from user_refresh_token;
+
 
 
