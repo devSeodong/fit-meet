@@ -5,7 +5,14 @@
 
 <mapper namespace="com.ssafy.fitmeet.domain.auth.dao.UserRefreshTokenDao">
 
-    <resultMap id="UserRefreshTokenMap" type="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken"></resultMap>
+    <resultMap id="UserRefreshTokenMap"
+               type="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken">
+        <id     property="userId"       column="user_id"/>
+        <result property="refreshToken" column="refresh_token"/>
+        <result property="expiresAt"    column="expires_at"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="updatedAt"    column="updated_at"/>
+    </resultMap>
 
     <select id="findByUserId" resultMap="UserRefreshTokenMap">
         SELECT
@@ -26,12 +33,12 @@
             created_at,
             updated_at
         ) VALUES (
-            #{userId},
-            #{refreshToken},
-            #{expiresAt},
-            NOW(),
-            NOW()
-        )
+                     #{userId},
+                     #{refreshToken},
+                     #{expiresAt},
+                     NOW(),
+                     NOW()
+                 )
     </insert>
 
     <update id="update" parameterType="com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken">

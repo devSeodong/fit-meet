@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,19 +48,11 @@ public class AuthController {
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
 		LoginResponse loginRes = authService.login(request);
 
-		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", loginRes.accessToken())
-				.httpOnly(true)
-				.path("/")
-				.maxAge(1800)
-				.sameSite("Lax")
-				.build();
+		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", loginRes.accessToken()).httpOnly(true)
+				.path("/").maxAge(1800).sameSite("Lax").build();
 
-		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", loginRes.refreshToken())
-				.httpOnly(true)
-				.path("/api/auth")
-				.maxAge(1209600)
-				.sameSite("Lax")
-				.build();
+		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", loginRes.refreshToken()).httpOnly(true)
+				.path("/api/auth").maxAge(1209600).sameSite("Lax").build();
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
@@ -89,32 +82,18 @@ public class AuthController {
 		if (refreshToken == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
-		
-		LoginResponse newTokens;
-        try {
-            newTokens = authService.refreshAccessToken(refreshToken);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        
+
+		String newAccessToken = authService.regenerateAccessTokenByRefreshToken(refreshToken);
+
 		ResponseCookie accessCookie = ResponseCookie
-				.from("ACCESS_TOKEN", newTokens.accessToken())
+				.from("ACCESS_TOKEN", newAccessToken)
 				.httpOnly(true)
 				.path("/")
 				.maxAge(1800)
 				.sameSite("Lax")
 				.build();
-		
-		ResponseCookie refreshCookie = ResponseCookie
-				.from("REFRESH_TOKEN", newTokens.refreshToken())
-                .httpOnly(true)
-                .path("/api/auth")
-                .maxAge(1209600)
-                .sameSite("Lax")
-                .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
 		return ResponseEntity.ok().build();
 	}
@@ -124,35 +103,31 @@ public class AuthController {
 	 */
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃")
-	public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-		
-		String email = null;
-		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if(auth != null && auth.isAuthenticated()) {
-			email = auth.getName();
+	public ResponseEntity<Void> logout(HttpServletResponse response) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && auth.isAuthenticated()) {
+			String email = auth.getName();
+			authService.logout(email); //
 		}
-		
-		if(email != null) {
-			authService.logout(email);
-		}
-		
+
 		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", "")
-	            .httpOnly(true)
-	            .path("/")
-	            .maxAge(0)
-	            .sameSite("Lax")
-	            .build();
+				.httpOnly(true)
+				.path("/")
+				.maxAge(0)
+				.sameSite("Lax")
+				.build();
 
-	    ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
-	            .httpOnly(true)
-	            .path("/api/auth")
-	            .maxAge(0)
-	            .sameSite("Lax")
-	            .build();
+		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
+				.httpOnly(true)
+				.path("/api/auth")
+				.maxAge(0)
+				.sameSite("Lax")
+				.build();
 
-	    response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-	    response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
 }

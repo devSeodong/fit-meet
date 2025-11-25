@@ -12,10 +12,10 @@ public interface UserRefreshTokenDao {
 	UserRefreshToken findByUserId(@Param("userId") Long userId);
 	
 	// 토큰 저장
-	int insert(@Param("token") UserRefreshToken token);
+	int insert(UserRefreshToken token);
 	
 	// 토큰 업데이트
-	int update(@Param("token") UserRefreshToken token);
+	int update(UserRefreshToken token);
 	
 	// UserId로 토큰 정보 삭제 ( 로그아웃 )
 	int deleteByUserId(@Param("userId") Long userId);

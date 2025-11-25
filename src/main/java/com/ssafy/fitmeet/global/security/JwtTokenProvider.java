@@ -51,13 +51,13 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
-    
+
     public String createRefreshToken(String email) {
-    	Claims claims = Jwts.claims().setSubject(email);
+        Claims claims = Jwts.claims().setSubject(email);
         claims.put("type", "refresh");
 
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
+        Date expiry = new Date(now.getTime() + refreshTokenValidityInMs);
 
         return Jwts.builder()
                 .setClaims(claims)
