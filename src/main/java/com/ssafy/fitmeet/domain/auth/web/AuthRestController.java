@@ -4,6 +4,11 @@ import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginRequest;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginResponse;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.SignUpRequest;
 import com.ssafy.fitmeet.domain.auth.service.AuthService;
+import com.ssafy.fitmeet.global.error.CustomException;
+import com.ssafy.fitmeet.global.error.ErrorCode;
+import com.ssafy.fitmeet.global.response.Response;
+import com.ssafy.fitmeet.global.response.ResponseUtil;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
@@ -36,10 +41,10 @@ public class AuthRestController {
 	 * 회원가입
 	 */
 	@PostMapping("/signup")
-	@Operation(summary = "회원가입", description = "이메일, 비밀번호, 기본정보, 신체정보 입력 회원가입")
-	public ResponseEntity<?> signUp(@RequestBody SignUpRequest request) {
+	@Operation(summary = "회원가입", description = "이메일, 비밀번호, 기본정보 입력 회원가입")
+	public ResponseEntity<Response<?>> signUp(@RequestBody SignUpRequest request) {
 		Long userId = authService.signUp(request);
-		return ResponseEntity.ok(userId);
+		return ResponseEntity.ok(ResponseUtil.ok(userId));
 	}
 
 	/**
@@ -47,7 +52,7 @@ public class AuthRestController {
 	 */
 	@PostMapping("/login")
 	@Operation(summary = "로그인", description = "이메일/비밀번호로 로그인 후 JWT 액세스 토큰을 반환")
-	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+	public ResponseEntity<Response<?>> login(@RequestBody LoginRequest request, HttpServletResponse response) {
 		LoginResponse loginRes = authService.login(request);
 
 		ResponseCookie accessCookie = ResponseCookie
@@ -69,8 +74,8 @@ public class AuthRestController {
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		return ResponseEntity
-				.ok(new LoginResponse(null, null, loginRes.tokenType(), loginRes.issuedAt(), loginRes.expiresAt()));
+		return ResponseEntity.ok(ResponseUtil.ok(
+			new LoginResponse(null, null, loginRes.tokenType(), loginRes.issuedAt(), loginRes.expiresAt())));
 	}
 
 	/**
@@ -78,7 +83,7 @@ public class AuthRestController {
 	 */
 	@PostMapping("/refresh")
 	@Operation(summary = "새로고침", description = "")
-	public ResponseEntity<String> refresh(HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<Response<?>> refresh(HttpServletRequest request, HttpServletResponse response) {
 
 		String refreshToken = null;
 		Cookie[] cookies = request.getCookies();
@@ -93,7 +98,7 @@ public class AuthRestController {
 		}
 
 		if (refreshToken == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰이 업슴 ㅠㅠ ");
+			throw new CustomException(ErrorCode.AUTH_INVALID_REFRESH_TOKEN);
 		}
 
 		String newAccessToken = authService.regenerateAccessTokenByRefreshToken(refreshToken);
@@ -108,7 +113,7 @@ public class AuthRestController {
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		return ResponseEntity.ok().body("새로고침 완료 !");
+		return ResponseEntity.ok(ResponseUtil.ok("새로고침 완료 !"));
 	}
 	
 	/**
@@ -116,7 +121,7 @@ public class AuthRestController {
 	 */
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃")
-	public ResponseEntity<String> logout(HttpServletResponse response) {
+	public ResponseEntity<Response<?>> logout(HttpServletResponse response) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.isAuthenticated()) {
@@ -141,6 +146,6 @@ public class AuthRestController {
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		return ResponseEntity.ok().body("로그아웃 완료 !");
+		return ResponseEntity.ok(ResponseUtil.ok("로그아웃 완료 !"));
 	}
 }

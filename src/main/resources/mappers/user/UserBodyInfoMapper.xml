@@ -18,7 +18,6 @@
         updated_at
     </sql>
 
-<!--  -->
     <select id="findByUserId" resultType="UserBodyInfo">
         SELECT <include refid="BodyColumns"/>
         FROM user_body_info

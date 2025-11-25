@@ -14,6 +14,8 @@ public enum ErrorCode {
     AUTH_EXPIRED_TOKEN(1002, HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     AUTH_ACCESS_DENIED(1003, HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     AUTH_BAD_CREDENTIALS(1004, HttpStatus.UNAUTHORIZED, "아이디 혹은 비밀번호가 틀렸습니다."),
+    AUTH_INVALID_REFRESH_TOKEN(1005, HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
+    AUTH_NON_SAVED_REFRESH_TOKEN(1006, HttpStatus.UNAUTHORIZED, "저장된 리프레시 토큰 정보가 없습니다."),
 
     // 2000번대: 유저 관련
     USER_NOT_FOUND(2001, HttpStatus.BAD_REQUEST, "유저를 찾을 수 없습니다."),
