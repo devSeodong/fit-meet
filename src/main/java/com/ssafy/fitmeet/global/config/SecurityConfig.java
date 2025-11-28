@@ -4,7 +4,8 @@ import com.ssafy.fitmeet.global.security.CustomUserDetailsService;
 import com.ssafy.fitmeet.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.*;
 
 /**
  * Spring Security 전역 설정 - 세션을 사용하지 않는 JWT 기반 인증 (STATELESS) - /api/auth/** 경로는
@@ -39,6 +41,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http.csrf(csrf -> csrf.disable())
+        		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(
 						auth -> auth.requestMatchers(WHITE_LIST).permitAll().anyRequest().authenticated())
@@ -47,6 +50,33 @@ public class SecurityConfig {
 				.formLogin((form)->form.disable());
 
 		return http.build();
+	}
+	
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		
+		CorsConfiguration config = new CorsConfiguration();
+		
+		config.setAllowedOrigins(List.of("http://localhost:5050"));
+		config.setAllowCredentials(true);
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+		
+		config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept"
+        ));
+		
+		config.setExposedHeaders(List.of(
+                "Authorization",
+                "Set-Cookie"
+        ));
+		
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        
+        return source;
 	}
 
 	/**
