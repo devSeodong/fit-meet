@@ -18,7 +18,7 @@ CREATE TABLE `user` (
     `password_changed_at` DATETIME NULL, -- 마지막 비밀번호 변경 시각
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 계정 생성 시각
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 계정 정보 수정 시각
-    `deleted_at` DATETIME NULL COMMENT '탈퇴 처리 시각 (소프트 삭제용)', -- 소프트 삭제 ( 탈퇴 처리 시각 )
+    `deleted_at` DATETIME NULL, -- 소프트 삭제 ( 탈퇴 처리 시각 )
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_user_email` (`email`),
     KEY `idx_user_status` (`status`),
@@ -69,11 +69,11 @@ ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- 리프레시 토큰 저장 테이블
 CREATE TABLE `user_refresh_token` (
-    `user_id`      BIGINT UNSIGNED NOT NULL, -- USER.id (FK)
+    `user_id` BIGINT UNSIGNED NOT NULL, -- USER.id (FK)
     `refresh_token` VARCHAR(512) NOT NULL, -- 리프레시 토큰 문자열 (JWT)
-    `expires_at`    DATETIME NOT NULL, -- 리프레시 토큰 만료 시각
-    `created_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `expires_at` DATETIME NOT NULL, -- 리프레시 토큰 만료 시각
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`user_id`),
     CONSTRAINT `fk_urt_user`
         FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
@@ -81,13 +81,48 @@ CREATE TABLE `user_refresh_token` (
 
 ------------------------------------------------------------------------------------
 
--- 식단 기본 테이블
+-- 식단 입력 테이블
 DROP TABLE IF EXISTS `diet`;
 CREATE TABLE `diet` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 (PK)
-    PRIMARY KEY (`id`)
-) 
-ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `date` DATETIME NOT NULL, -- 식단 날짜 
+    `meal_type` CHAR(1) NOT NULL, -- 식단 종류 ( A : 아침, B : 점심, C : 저녁, D : 간식, E : 야식 )
+    `description` VARCHAR(255), --  메모
+    `image_url` VARCHAR(255), -- 이미지 URL
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted_at` DATETIME NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_diet_user_id`
+        FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- 식단 점수 테이블 
+DROP TABLE IF EXISTS `diet_score`;
+CREATE TABLE `diet_score` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 (PK)
+    `diet_id` BIGINT UNSIGNED NOT NULL,
+    `score` INT NOT NULL DEFAULT 0, -- 점수
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_diet_score_diet_id`
+        FOREIGN KEY (`diet_id`) REFERENCES `diet`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- 식단 정보 테이블 
+DROP TABLE IF EXISTS `diet_info`;
+CREATE TABLE `diet_info` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 (PK)
+    `diet_id` BIGINT UNSIGNED NOT NULL, 
+    -- 이미지 분석 / 직접입력 / 공공데이터 조회 등으로 매핑된 컬럼들 
+    -- 섭취 그람수, 칼로리, 탄수화물, 단백질, 지방, 당류, 나트륨 등.. 
+    
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_diet_info_diet_id`
+        FOREIGN KEY (`diet_id`) REFERENCES `diet`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
 
 select * 
 from user u join user_body_info ub

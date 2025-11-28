@@ -40,6 +40,11 @@ jwt:
   access-token-validity-in-ms: 3600000
   refresh-token-validity-in-ms: 1209600000
   
+app:
+  cookie:
+    access-max-age: 1800
+    refresh-max-age: 1209600
+  
 open-api:
   nutri : 
     end-point : "https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02/getFoodNtrCpntDbInq02"
@@ -50,4 +55,26 @@ logging:
     org.mybatis: DEBUG
     org.mybatis.spring: DEBUG
     com.ssafy.fitmeet: DEBUG
+    
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+app:
+  cookie:
+    same-site: Lax
+    secure: false
+    
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+app:
+  cookie:
+    same-site: None
+    secure: true
 

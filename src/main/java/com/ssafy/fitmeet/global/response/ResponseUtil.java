@@ -10,8 +10,8 @@ public class ResponseUtil {
 
     public static <T> Response<T> ok(String msg, T data) {
         return Response.<T>builder()
-                .returnId(ErrorCode.SUCCESS.getCode())
-                .returnMsg(msg)
+                .code(ErrorCode.SUCCESS.getCode())
+                .msg(msg)
                 .data(data)
                 .build();
     }

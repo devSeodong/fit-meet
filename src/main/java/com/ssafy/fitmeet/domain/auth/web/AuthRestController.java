@@ -4,6 +4,7 @@ import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginRequest;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginResponse;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.SignUpRequest;
 import com.ssafy.fitmeet.domain.auth.service.AuthService;
+import com.ssafy.fitmeet.global.config.CookieProps;
 import com.ssafy.fitmeet.global.error.CustomException;
 import com.ssafy.fitmeet.global.error.ErrorCode;
 import com.ssafy.fitmeet.global.response.Response;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthRestController {
 
 	private final AuthService authService;
+	private final CookieProps cookieProps;
 
 	/**
 	 * 회원가입
@@ -48,27 +50,29 @@ public class AuthRestController {
 	}
 
 	/**
-	 * 로그인 뷰가 다른 도메인/포트에서 돌아가면 sameSite("None").secure(true) + CORS 설정까지 맞춰줘야 하는 포인트
+	 * 로그인
 	 */
 	@PostMapping("/login")
 	@Operation(summary = "로그인", description = "이메일/비밀번호로 로그인 후 JWT 액세스 토큰을 반환")
 	public ResponseEntity<Response<?>> login(@RequestBody LoginRequest request, HttpServletResponse response) {
 		LoginResponse loginRes = authService.login(request);
-
+		
 		ResponseCookie accessCookie = ResponseCookie
 				.from("ACCESS_TOKEN", loginRes.accessToken())
 				.httpOnly(true)
+				.secure(cookieProps.isSecure())
 				.path("/")
 				.maxAge(1800)
-				.sameSite("Lax")
+				.sameSite(cookieProps.getSameSite())
 				.build();
 
 		ResponseCookie refreshCookie = ResponseCookie
 				.from("REFRESH_TOKEN", loginRes.refreshToken())
 				.httpOnly(true)
+				.secure(cookieProps.isSecure())
 				.path("/api/auth")
 				.maxAge(1209600)
-				.sameSite("Lax")
+				.sameSite(cookieProps.getSameSite())
 				.build();
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -106,9 +110,10 @@ public class AuthRestController {
 		ResponseCookie accessCookie = ResponseCookie
 				.from("ACCESS_TOKEN", newAccessToken)
 				.httpOnly(true)
+				.secure(cookieProps.isSecure())
 				.path("/")
 				.maxAge(1800)
-				.sameSite("Lax")
+				.sameSite(cookieProps.getSameSite())
 				.build();
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -131,16 +136,18 @@ public class AuthRestController {
 
 		ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", "")
 				.httpOnly(true)
+				.secure(cookieProps.isSecure())
 				.path("/")
 				.maxAge(0)
-				.sameSite("Lax")
+				.sameSite(cookieProps.getSameSite())
 				.build();
 
 		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
 				.httpOnly(true)
+				.secure(cookieProps.isSecure())
 				.path("/api/auth")
 				.maxAge(0)
-				.sameSite("Lax")
+				.sameSite(cookieProps.getSameSite())
 				.build();
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
