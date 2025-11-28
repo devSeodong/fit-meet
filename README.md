@@ -153,16 +153,6 @@ FitMeet의 모든 REST API 응답은 아래 **단일 Response 포맷**을 사용
 
 ---
 
-## ⚙️ Run 시 dev 설정
-
-> STS -> Run -> Run Configuration -> Spring Boot App ( FitMeetApplication ) -> Arguments 탭 -> Program Argument
-
-```bash
---spring.profiles.active=dev
-```
-
----
-
 ## ✅ Response 공통 구조
 
 ```json
@@ -262,6 +252,20 @@ ErrorCode 기반의 통일된 Response 구조로 변환됩니다.
 * `AccessDeniedException` (권한 없음)
 * 기타 모든 예외
   
+---
+
+# 📦 4️⃣ 공통 Response 규칙 (API 응답 통일)
+
+---
+
+## ⚙️ Run 시 dev 설정
+
+> STS -> Run -> Run Configuration -> Spring Boot App ( FitMeetApplication ) -> Arguments 탭 -> Program Argument
+
+```bash
+--spring.profiles.active=dev
+```
+
 ---
 
 ## 🔚 마무리
