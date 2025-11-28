@@ -23,6 +23,7 @@
 
 1. Fork할 레파지토리에서 new Fork 생성하여 본인 레파지토리로 이관
 2. STS에 git clone 후
+   
    ```bash
    git remote add master {상위 레파지토리}
    git remote add origin {본인 레파지토리}
