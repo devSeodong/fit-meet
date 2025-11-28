@@ -254,7 +254,7 @@ ErrorCode 기반의 통일된 Response 구조로 변환됩니다.
   
 ---
 
-# 📦 4️⃣ 공통 Response 규칙 (API 응답 통일)
+# 🏃 5️⃣ RUN 설정
 
 ---
 
