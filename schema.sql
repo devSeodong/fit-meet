@@ -36,7 +36,7 @@ CREATE TABLE `user_body_info` (
     `target_weight_kg` DECIMAL(5,2) NULL, -- 목표 몸무게 소수점 둘째자리, kg
     `gender` VARCHAR(10) NULL, -- 성별 ( MALE, FEMALE, OTHER )
     `birth_date` DATE NULL, -- 생년월일
-    `activity_level` VARCHAR(20) NULL, -- 활동량 수준 ( LOW, MID, HIGH )
+    `activity_level` VARCHAR(20) NULL, -- 활동량 수준 ( NONE, LOW, MID, HIGH )
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 정보 등록 시각
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 정보 수정 시각
     PRIMARY KEY (`id`),
@@ -112,15 +112,23 @@ CREATE TABLE `diet_score` (
 -- 식단 정보 테이블 
 DROP TABLE IF EXISTS `diet_info`;
 CREATE TABLE `diet_info` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 (PK)
-    `diet_id` BIGINT UNSIGNED NOT NULL, 
-    -- 이미지 분석 / 직접입력 / 공공데이터 조회 등으로 매핑된 컬럼들 
-    -- 섭취 그람수, 칼로리, 탄수화물, 단백질, 지방, 당류, 나트륨 등.. 
-    
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, -- 기본키 ( PK )
+    `diet_id` BIGINT UNSIGNED NOT NULL, -- 식단 아이디 ( FK )
+    `food_nm_kr` VARCHAR(100) NOT NULL, -- 식단 이름 
+    `intake_gram` DECIMAL(8,3) DEFAULT NULL, -- 식단 무게
+    `kcal` DECIMAL(8,3) DEFAULT NULL, -- 칼로리
+    `carbohydrate` DECIMAL(8,3) DEFAULT NULL, -- 탄수화물
+    `protein` DECIMAL(8,3) DEFAULT NULL, -- 단백질
+    `fat` DECIMAL(8,3) DEFAULT NULL, -- 지방
+    `sugar` DECIMAL(8,3) DEFAULT NULL, -- 당류
+    `sodium` DECIMAL(10,3) DEFAULT NULL, -- 나트륨
+    `dietary_fiber` DECIMAL(8,3) DEFAULT NULL, -- 식이섬유
     PRIMARY KEY (`id`),
+    KEY `idx_diet_info_diet_id` (`diet_id`),
     CONSTRAINT `fk_diet_info_diet_id`
         FOREIGN KEY (`diet_id`) REFERENCES `diet`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 
 
 
