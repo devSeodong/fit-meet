@@ -26,17 +26,17 @@
 	</select>
 	
 	<!-- 식단 등록 -->
-	<insert id="">
-	
+	<insert id="insertDiet">
+		
 	</insert>
 	
 	<!-- 식단 수정 -->
-	<update id="">
+	<update id="updateDiet">
 	
 	</update>
 	
 	<!-- 식단 삭제 -->
-	<delete id="">
+	<delete id="deleteDiet">
 	
 	</delete>
 	
