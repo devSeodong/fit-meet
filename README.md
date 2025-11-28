@@ -19,12 +19,21 @@
 
 > 브랜치를 사용하지 않기 때문에, **반드시 아래 순서 준수!**
 
+### 🔹 포크하는 법
+
+1. Fork할 레파지토리에서 new Fork 생성하여 본인 레파지토리로 이관
+2. STS에 git clone 후
+   ```bash
+   git remote add master {상위 레파지토리}
+   git remote add origin {본인 레파지토리}
+   ```
+
 ### 🔹 작업 전
 
-1. 최신 코드 가져오기
+1. 최신 Master 코드 가져오기
 
    ```bash
-   git pull origin main
+   git pull master main
    ```
 
 ### 🔹 작업 후
@@ -36,7 +45,34 @@
    git diff
    ```
 
-2. 필요한 파일만 스테이징
+2. 충돌 방지 — 변경 된 코드 Stash
+
+   ```bash
+   git stash push -m "message"
+   git stash save "message"
+   git stash
+   ```
+   => 셋 중 선택 자유
+
+   ```bash
+   git stash list
+   ```
+   => stash 목록 확인
+
+3. 충돌 방지 — 최신 코드 Pull
+
+   ```bash
+   git pull master main
+   ```
+
+4. 충돌 방지 — Stash 해놓은 내 변경사항 다시 반영
+
+   ```bash
+   git stash apply stash@{index}
+   ```
+   => 만약 Merge 해야할 상황있다면 Merge 후 Pull Request 시 메시지 남겨놓기
+
+5. 필요한 파일만 스테이징
 
    ```bash
    git add <파일명>
@@ -44,7 +80,7 @@
    git add .
    ```
 
-3. 의미 있는 커밋 메시지 작성
+6. 의미 있는 커밋 메시지 작성
 
    ```bash
    git commit -m "[feat] 회원가입 API 구현"
@@ -52,17 +88,14 @@
    git commit -m "[docs] README 업데이트"
    ```
 
-4. 충돌 방지 — push하기 전 다시 최신 코드 Pull
-
-   ```bash
-   git pull origin main
-   ```
-
-5. 이상 없으면 Push
+7. 이상 없으면 Push
 
    ```bash
    git push origin main
    ```
+
+8. Origin에 Push 된 변경 사항 Master로 Pull Request
+   
 
 > ⚠️ **main이 배포 기준 브랜치입니다.**
 > 빌드/실행 안 되는 코드는 절대 올리지 말아주세요 🙏
