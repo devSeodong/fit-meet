@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService{
                 .getAuthentication()
                 .getName();
     }
-    
+
     /**
      * 이메일 사용자 조회 ( 로그인, 이메일 중복 체크 )
      */

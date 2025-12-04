@@ -40,7 +40,7 @@ public class UserRestController {
 	}
 	
 	@GetMapping("/info")
-	@Operation(summary = "이메일 사용자 조회", description = " 로그인, 이메일 중복 체크 ")
+	@Operation(summary = "이메일 사용자 조회", description = " 이메일로 사용자 조회 ")
 	public ResponseEntity<Response<?>> getInfo(@RequestParam("email") String email) {
 		User info = userService.getUserInfoEmail(email);
 		return ResponseEntity.ok(ResponseUtil.ok(info));

@@ -61,6 +61,13 @@ public class AuthServiceImpl implements AuthService{
         return user.getId();
     }
 
+    @Override
+    public User getUserInfoEmail(String email) {
+        User user = userDao.findByEmail(email);
+        if(user != null) throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATED);
+        return null;
+    }
+
     /**
      * 로그인 + JWT 발급
      */

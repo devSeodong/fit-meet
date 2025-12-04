@@ -4,6 +4,8 @@ import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginRequest;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.LoginResponse;
 import com.ssafy.fitmeet.domain.auth.dto.AuthDto.SignUpRequest;
 import com.ssafy.fitmeet.domain.auth.service.AuthService;
+import com.ssafy.fitmeet.domain.user.entity.User;
+import com.ssafy.fitmeet.domain.user.service.UserService;
 import com.ssafy.fitmeet.global.config.CookieProps;
 import com.ssafy.fitmeet.global.error.CustomException;
 import com.ssafy.fitmeet.global.error.ErrorCode;
@@ -19,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,6 +48,16 @@ public class AuthRestController {
 	public ResponseEntity<Response<?>> signUp(@RequestBody SignUpRequest request) {
 		Long userId = authService.signUp(request);
 		return ResponseEntity.ok(ResponseUtil.ok(userId));
+	}
+
+	/**
+	 * 이메일 사용자 조회
+	 */
+	@GetMapping("/email-info")
+	@Operation(summary = "이메일 사용자 조회", description = " 로그인, 이메일 중복 체크 ")
+	public ResponseEntity<Response<?>> getInfo(@RequestParam("email") String email) {
+		User info = authService.getUserInfoEmail(email);
+		return ResponseEntity.ok(ResponseUtil.ok(info));
 	}
 
 	/**
