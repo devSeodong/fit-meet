@@ -66,9 +66,33 @@ public class MealServiceImpl implements MealService {
         return nutrition;
     }
 
+    /**
+     * 통합 검색:
+     * 1) local DB(meal) 검색
+     * 2) 없으면 공공데이터 API 검색 → meal / meal_nutrition 캐시 → Meal 리스트 반환
+     */
     @Override
+    @Transactional
     public List<Meal> searchMeals(String keyword, String category) {
-        return mealDao.searchByKeyword(keyword, category);
+
+        List<Meal> local = mealDao.searchByKeyword(keyword, category);
+        if (!local.isEmpty()) {
+            return local;
+        }
+
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+
+        List<FoodNtrResponse.Item> items = foodOpenApiClient.searchFoods(keyword, category, 1, 20);
+
+        if (items == null || items.isEmpty()) {
+            return List.of();
+        }
+
+        return items.stream()
+                .map(this::convertItemToMealAndCache)
+                .toList();
     }
 
     @Override
@@ -95,9 +119,30 @@ public class MealServiceImpl implements MealService {
             return null;
         }
 
+        return buildMealFromItem(item);
+    }
+
+    /**
+     * 공공데이터에서 영양성분 부분만 뽑아서 MealNutrition 생성
+     */
+    private MealNutrition fetchMealNutritionFromPublicApi(Meal meal) {
+
+        FoodNtrResponse.Item item = foodOpenApiClient.getByFoodCd(meal.getFoodCd());
+        if (item == null) {
+            log.warn("[MealService] 공공데이터에서 영양성분 조회 실패, foodCd={}", meal.getFoodCd());
+            return null;
+        }
+
+        return buildNutritionFromItem(item, null);
+    }
+
+    /**
+     * API 응답 Item → Meal 엔티티로 변환
+     */
+    private Meal buildMealFromItem(FoodNtrResponse.Item item) {
         LocalDate updateDate = null;
         if (item.getUpdateDate() != null && !item.getUpdateDate().isBlank()) {
-            updateDate = LocalDate.parse(item.getUpdateDate());
+            updateDate = LocalDate.parse(item.getUpdateDate()); // "2025-01-23"
         }
 
         return Meal.builder()
@@ -113,7 +158,7 @@ public class MealServiceImpl implements MealService {
                 .foodCat3Nm(item.getFoodCat3Nm())
                 .servingSizeRaw(item.getServingSize())
                 .sourceType("PUBLIC_API")
-                .category(item.getFoodCat1Nm())
+                .category(item.getFoodCat1Nm()) // 대분류명을 기본 category로 사용
                 .brand(null)
                 .tags(null)
                 .updateDate(updateDate)
@@ -121,28 +166,22 @@ public class MealServiceImpl implements MealService {
     }
 
     /**
-     * 공공데이터에서 영양성분 부분만 뽑아서 MealNutrition 생성
+     * API 응답 Item → MealNutrition 엔티티로 변환\
      */
-    private MealNutrition fetchMealNutritionFromPublicApi(Meal meal) {
-
-        FoodNtrResponse.Item item = foodOpenApiClient.getByFoodCd(meal.getFoodCd());
-        if (item == null) {
-            log.warn("[MealService] 공공데이터에서 영양성분 조회 실패, foodCd={}", meal.getFoodCd());
-            return null;
-        }
+    private MealNutrition buildNutritionFromItem(FoodNtrResponse.Item item, Long mealId) {
 
         BigDecimal baseAmountG = parseBaseAmountG(item.getServingSize());
 
         BigDecimal kcal = toBigDecimalOrNull(item.getAmtNum1()); // 열량
         BigDecimal protein = toBigDecimalOrNull(item.getAmtNum3()); // 단백질
         BigDecimal fat = toBigDecimalOrNull(item.getAmtNum4()); // 지방
-        BigDecimal carbohydrate = toBigDecimalOrNull(item.getAmtNum6()); // 탄수화물
+        BigDecimal carbohydrate = toBigDecimalOrNull(item.getAmtNum6());// 탄수화물
         BigDecimal sugar = toBigDecimalOrNull(item.getAmtNum7()); // 당류
-        BigDecimal dietaryFiber = toBigDecimalOrNull(item.getAmtNum8()); // 식이섬유
+        BigDecimal dietaryFiber = toBigDecimalOrNull(item.getAmtNum8());// 식이섬유
         BigDecimal sodium = toBigDecimalOrNull(item.getAmtNum13()); // 나트륨
 
         return MealNutrition.builder()
-                .mealId(null) // getOrFetchNutritionByFoodCd에서 세팅
+                .mealId(mealId)
                 .baseAmountG(baseAmountG)
                 .kcal(kcal)
                 .carbohydrate(carbohydrate)
@@ -152,6 +191,37 @@ public class MealServiceImpl implements MealService {
                 .sodium(sodium)
                 .dietaryFiber(dietaryFiber)
                 .build();
+    }
+
+    /**
+     * 통합 검색 시: Item → Meal/MealNutrition 캐시하고 Meal 반환
+     */
+    private Meal convertItemToMealAndCache(FoodNtrResponse.Item item) {
+
+        Meal existing = mealDao.findByFoodCd(item.getFoodCd());
+        if (existing != null) {
+            ensureNutritionCached(existing, item);
+            return existing;
+        }
+
+        Meal meal = buildMealFromItem(item);
+        mealDao.insert(meal);
+
+        ensureNutritionCached(meal, item);
+        return meal;
+    }
+
+    /**
+     * 해당 Meal에 대한 nutrition 캐시가 없으면 생성해서 insert
+     */
+    private void ensureNutritionCached(Meal meal, FoodNtrResponse.Item item) {
+        MealNutrition existingNut = mealNutritionDao.findByMealId(meal.getId());
+        if (existingNut != null) {
+            return;
+        }
+
+        MealNutrition nutrition = buildNutritionFromItem(item, meal.getId());
+        mealNutritionDao.insert(nutrition);
     }
 
     /**
@@ -186,6 +256,9 @@ public class MealServiceImpl implements MealService {
         }
     }
 
+    /**
+     * 공공데이터 직접 검색용 - 디버그/관리자용
+     */
     @Override
     public List<FoodNtrResponse.Item> searchMealsFromApi(String name, String category, int page, int size) {
         return foodOpenApiClient.searchFoods(name, category, page, size);

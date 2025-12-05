@@ -24,9 +24,11 @@ public class MealRestController {
 
     /**
      * 음식 검색 (검색창용)
+     * - 1) 로컬 DB 검색
+     * - 2) 없으면 공공데이터 API 검색 + 캐시 후 반환
      */
     @GetMapping("/search")
-    @Operation(summary = "음식 검색", description = "키워드/카테고리 기반 음식 목록 조회")
+    @Operation(summary = "음식 검색", description = "키워드/카테고리 기반 음식 목록 조회 (DB 우선, 없으면 공공데이터)")
     public ResponseEntity<Response<?>> searchMeals(@RequestParam(required = false) String keyword, @RequestParam(required = false) String category) {
         List<Meal> meals = mealService.searchMeals(keyword, category);
         return ResponseEntity.ok(ResponseUtil.ok(meals));
@@ -36,7 +38,7 @@ public class MealRestController {
      * foodCd 기준 단건 조회
      */
     @GetMapping("/{foodCd}")
-    @Operation(summary = "음식 단건 조회", description = "foodCd 기준으로 음식 정보 조회")
+    @Operation(summary = "음식 단건 조회", description = "foodCd 기준으로 음식 정보 조회 (DB 없으면 공공데이터)")
     public ResponseEntity<Response<?>> getMeal(@PathVariable String foodCd) {
         Meal meal = mealService.getOrFetchMealByFoodCd(foodCd);
         return ResponseEntity.ok(ResponseUtil.ok(meal));
@@ -46,13 +48,17 @@ public class MealRestController {
      * foodCd 기준 영양성분 조회
      */
     @GetMapping("/{foodCd}/nutrition")
-    @Operation(summary = "영양성분 조회", description = "foodCd 기준 영양성분 조회")
+    @Operation(summary = "영양성분 조회", description = "foodCd 기준 영양성분 조회 (DB 없으면 공공데이터)")
     public ResponseEntity<Response<?>> getNutrition(@PathVariable String foodCd) {
         MealNutrition nutrition = mealService.getOrFetchNutritionByFoodCd(foodCd);
         return ResponseEntity.ok(ResponseUtil.ok(nutrition));
     }
 
+    /**
+     * 공공데이터 RAW 응답 그대로 보고 싶을 때
+     */
     @GetMapping("/search/external")
+    @Operation(summary = "공공데이터 직접 검색(디버깅용)", description = "공공데이터 FoodNtrCpnt API 직접 조회")
     public ResponseEntity<Response<?>> searchExternalMeals(@RequestParam(required = false) String name, @RequestParam(required = false) String category, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
         List<FoodNtrResponse.Item> items = mealService.searchMealsFromApi(name, category, page, size);
         return ResponseEntity.ok(ResponseUtil.ok(items));

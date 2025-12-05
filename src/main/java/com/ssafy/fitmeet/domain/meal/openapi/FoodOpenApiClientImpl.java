@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -21,13 +22,21 @@ public class FoodOpenApiClientImpl implements FoodOpenApiClient {
     private final OpenApiNutriProperties properties;
     private final RestTemplate restTemplate = new RestTemplate();
 
+    private String encodeParam(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
     private FoodNtrResponse callApi(URI uri) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<FoodNtrResponse> response = restTemplate.exchange(uri, HttpMethod.GET, entity, FoodNtrResponse.class);
+            ResponseEntity<FoodNtrResponse> response =
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, FoodNtrResponse.class);
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 log.warn("FoodNtr API 응답 오류: status={}", response.getStatusCode());
@@ -50,12 +59,12 @@ public class FoodOpenApiClientImpl implements FoodOpenApiClient {
     public FoodNtrResponse.Item getByFoodCd(String foodCd) {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(properties.getEndPoint())
-                .queryParam("serviceKey", properties.getKey())
+                .queryParam("serviceKey", properties.getKey())   // 이미 인코딩된 키
                 .queryParam("pageNo", 1)
                 .queryParam("numOfRows", 1)
                 .queryParam("type", "json")
                 .queryParam("FOOD_CD", foodCd)
-                .build(true)
+                .build(true)  // 값이 이미 인코딩된 것으로 취급
                 .toUri();
 
         FoodNtrResponse res = callApi(uri);
@@ -74,14 +83,18 @@ public class FoodOpenApiClientImpl implements FoodOpenApiClient {
                 .queryParam("numOfRows", 1)
                 .queryParam("type", "json");
 
-        if (foodName != null && !foodName.isBlank()) {
-            builder.queryParam("FOOD_NM_KR", foodName);
+        String encodedName = encodeParam(foodName);
+        String encodedCat1 = encodeParam(cat1Name);
+
+        if (encodedName != null) {
+            builder.queryParam("FOOD_NM_KR", encodedName);
         }
-        if (cat1Name != null && !cat1Name.isBlank()) {
-            builder.queryParam("FOOD_CAT1_NM", cat1Name);
+        if (encodedCat1 != null) {
+            builder.queryParam("FOOD_CAT1_NM", encodedCat1);
         }
 
         URI uri = builder.build(true).toUri();
+
         FoodNtrResponse res = callApi(uri);
         if (res == null || res.getBody() == null || res.getBody().getItems() == null) return null;
 
@@ -100,14 +113,18 @@ public class FoodOpenApiClientImpl implements FoodOpenApiClient {
                 .queryParam("numOfRows", numOfRows)
                 .queryParam("type", "json");
 
-        if (foodName != null && !foodName.isBlank()) {
-            builder.queryParam("FOOD_NM_KR", foodName);
+        String encodedName = encodeParam(foodName);
+        String encodedCat1 = encodeParam(cat1Name);
+
+        if (encodedName != null) {
+            builder.queryParam("FOOD_NM_KR", encodedName);
         }
-        if (cat1Name != null && !cat1Name.isBlank()) {
-            builder.queryParam("FOOD_CAT1_NM", cat1Name);
+        if (encodedCat1 != null) {
+            builder.queryParam("FOOD_CAT1_NM", encodedCat1);
         }
 
         URI uri = builder.build(true).toUri();
+
         FoodNtrResponse res = callApi(uri);
         if (res == null || res.getBody() == null) return List.of();
         if (res.getBody().getItems() == null) return List.of();
