@@ -1,28 +1,32 @@
 package com.ssafy.fitmeet.domain.diet.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DietInfo {
-	
-	private int id;
-	private int dietId;
+
+	private Long id;
+	private Long dietId;
+	private Long mealId;
 	private String foodNmKr;
-	private double intakeGram;
-	private double kcal;
-	private double carbohydrate;
-	private double protein;
-	private double fat;
-	private double sugar;
-	private double sodium;
-	private double dietaryFiber;
-	
+	private String foodCode;
+	private String sourceType;
+	private BigDecimal intakeGram;
+	private BigDecimal kcal;
+	private BigDecimal carbohydrate;
+	private BigDecimal protein;
+	private BigDecimal fat;
+	private BigDecimal sugar;
+	private BigDecimal sodium;
+	private BigDecimal dietaryFiber;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+
 }

@@ -21,8 +21,12 @@ public enum ErrorCode {
     USER_NOT_FOUND(2001, HttpStatus.BAD_REQUEST, "유저를 찾을 수 없습니다."),
     USER_EMAIL_DUPLICATED(2002, HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
 
-    // 3000번대: 비즈니스 도메인 (예: 챌린지, 식단 등) – 필요하면 추가
-    // CHALLENGE_NOT_FOUND(3001, HttpStatus.BAD_REQUEST, "챌린지를 찾을 수 없습니다."),
+    // 3000번대: 비즈니스 도메인
+    DIET_NOT_FOUND(3001, HttpStatus.BAD_REQUEST, "식단을 찾을 수 없습니다."),
+    MEAL_NOT_FOUND(3002, HttpStatus.BAD_REQUEST, "공공데이터에서 해당 식품을 찾을 수 없습니다"),
+    MEAL_NOT_FOUND2(3003, HttpStatus.BAD_REQUEST, "공공데이터 영양정보를 가져올 수 없습니다."),
+    DIET_FOOD_CODE_REQUIRED(3004, HttpStatus.BAD_REQUEST, "API/IMAGE 모드에서는 foodCode가 필요합니다."),
+
 
     // 8000번대: DB 관련
     DB_DUPLICATE_KEY(8001, HttpStatus.CONFLICT, "이미 존재하는 데이터입니다."),

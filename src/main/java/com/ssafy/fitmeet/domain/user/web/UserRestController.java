@@ -36,7 +36,7 @@ public class UserRestController {
 	public ResponseEntity<Response<?>> insertBody(@RequestBody UserBodyInfo request) {
         log.info("신체정보 : {}", request.toString());
 		userService.insertBodyInfo(request);
-		return ResponseEntity.ok(ResponseUtil.ok("신체 정보 등록 완료"));
+		return ResponseEntity.ok(ResponseUtil.ok("신체 정보 등록 완료", null));
 	}
 	
 	@GetMapping("/info")
@@ -57,21 +57,21 @@ public class UserRestController {
 	@Operation(summary = "프로필 수정", description = "기본정보, 신체정보 전체 수정")
 	public ResponseEntity<Response<?>> profileUpt (@RequestBody UpdateProfileRequest request) {
 		userService.updateProfile(request);
-		return ResponseEntity.ok(ResponseUtil.ok("프로필 수정 완료"));
+		return ResponseEntity.ok(ResponseUtil.ok("프로필 수정 완료", null));
 	}
 	
 	@PostMapping("/password-upt")
 	@Operation(summary = "비밀번호 변경", description = "기존 비밀번호, 새 비밀번호 요청")
 	public ResponseEntity<Response<?>> changePassword (@RequestBody ChangePasswordRequest request) {
 		userService.changePassword(request);
-		return ResponseEntity.ok(ResponseUtil.ok("비밀번호 변경 완료"));
+		return ResponseEntity.ok(ResponseUtil.ok("비밀번호 변경 완료", null));
 	}
 	
 	@PostMapping("/signout")
 	@Operation(summary = "회원 탈퇴", description = "회원 탈퇴 ( 소프트 삭제 - status, deletedAt )")
 	public ResponseEntity<Response<?>> softDelete() {
 		userService.softDelete();
-		return ResponseEntity.ok(ResponseUtil.ok("회원 탈퇴 완료"));
+		return ResponseEntity.ok(ResponseUtil.ok("회원 탈퇴 완료", null));
 	}
 	
 }

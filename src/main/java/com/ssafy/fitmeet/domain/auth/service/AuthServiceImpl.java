@@ -1,12 +1,9 @@
 package com.ssafy.fitmeet.domain.auth.service;
 
 import com.ssafy.fitmeet.domain.auth.dao.UserRefreshTokenDao;
-import com.ssafy.fitmeet.domain.auth.dto.AuthDto;
 import com.ssafy.fitmeet.domain.auth.entity.UserRefreshToken;
-import com.ssafy.fitmeet.domain.user.dao.UserBodyInfoDao;
 import com.ssafy.fitmeet.domain.user.dao.UserDao;
 import com.ssafy.fitmeet.domain.user.entity.User;
-import com.ssafy.fitmeet.domain.user.entity.UserBodyInfo;
 import com.ssafy.fitmeet.global.error.CustomException;
 import com.ssafy.fitmeet.global.error.ErrorCode;
 import com.ssafy.fitmeet.global.security.JwtTokenProvider;
@@ -81,8 +78,8 @@ public class AuthServiceImpl implements AuthService{
                 )
         );
 
-        org.springframework.security.core.userdetails.User principal =
-                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        com.ssafy.fitmeet.global.security.CustomUserDetails principal =
+                (com.ssafy.fitmeet.global.security.CustomUserDetails) authentication.getPrincipal();
 
         String email = principal.getUsername();
 
@@ -123,7 +120,6 @@ public class AuthServiceImpl implements AuthService{
                 null
         );
     }
-
 
     /**
      * 리프레시 메서드

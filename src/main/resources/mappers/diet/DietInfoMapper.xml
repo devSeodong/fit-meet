@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.diet.dao.DietInfoDao">
+
+    <resultMap id="DietInfoMap" type="com.ssafy.fitmeet.domain.diet.entity.DietInfo">
+        <id     property="id"            column="id"/>
+        <result property="dietId"        column="diet_id"/>
+        <result property="mealId"        column="meal_id"/>
+        <result property="foodNmKr"      column="food_nm_kr"/>
+        <result property="foodCode"      column="food_code"/>
+        <result property="sourceType"    column="source_type"/>
+        <result property="intakeGram"    column="intake_gram"/>
+        <result property="kcal"          column="kcal"/>
+        <result property="carbohydrate"  column="carbohydrate"/>
+        <result property="protein"       column="protein"/>
+        <result property="fat"           column="fat"/>
+        <result property="sugar"         column="sugar"/>
+        <result property="sodium"        column="sodium"/>
+        <result property="dietaryFiber"  column="dietary_fiber"/>
+        <result property="createdAt"     column="created_at"/>
+        <result property="updatedAt"     column="updated_at"/>
+    </resultMap>
+
+    <!-- 단건 INSERT -->
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.diet.entity.DietInfo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO diet_info (
+            diet_id,
+            meal_id,
+            food_nm_kr,
+            food_code,
+            source_type,
+            intake_gram,
+            kcal,
+            carbohydrate,
+            protein,
+            fat,
+            sugar,
+            sodium,
+            dietary_fiber
+        ) VALUES (
+             #{dietId},
+             #{mealId},
+             #{foodNmKr},
+             #{foodCode},
+             #{sourceType},
+             #{intakeGram},
+             #{kcal},
+             #{carbohydrate},
+             #{protein},
+             #{fat},
+             #{sugar},
+             #{sodium},
+             #{dietaryFiber}
+         )
+    </insert>
+
+    <!-- 여러 개 한번에 INSERT (이미지 인식 후 다건 저장용) -->
+    <insert id="insertBatch">
+        INSERT INTO diet_info (
+            diet_id,
+            meal_id,
+            food_nm_kr,
+            food_code,
+            source_type,
+            intake_gram,
+            kcal,
+            carbohydrate,
+            protein,
+            fat,
+            sugar,
+            sodium,
+            dietary_fiber
+            ) VALUES
+            <foreach collection="list" item="item" separator=",">
+                (
+                #{item.dietId},
+                #{item.mealId},
+                #{item.foodNmKr},
+                #{item.foodCode},
+                #{item.sourceType},
+                #{item.intakeGram},
+                #{item.kcal},
+                #{item.carbohydrate},
+                #{item.protein},
+                #{item.fat},
+                #{item.sugar},
+                #{item.sodium},
+                #{item.dietaryFiber}
+                )
+            </foreach>
+    </insert>
+
+    <!-- 특정 식단에 속한 음식들 조회 -->
+    <select id="findByDietId" parameterType="long" resultMap="DietInfoMap">
+        SELECT *
+        FROM diet_info
+        WHERE diet_id = #{dietId}
+        ORDER BY id ASC
+    </select>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.fitmeet.domain.diet.entity.DietInfo">
+        UPDATE diet_info
+        SET
+            food_nm_kr     = #{foodNmKr},
+            food_code      = #{foodCode},
+            source_type    = #{sourceType},
+            intake_gram    = #{intakeGram},
+            kcal           = #{kcal},
+            carbohydrate   = #{carbohydrate},
+            protein        = #{protein},
+            fat            = #{fat},
+            sugar          = #{sugar},
+            sodium         = #{sodium},
+            dietary_fiber  = #{dietaryFiber}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 식단 기준으로 전체 삭제 (다시 분석/재입력 시) -->
+    <delete id="deleteByDietId" parameterType="long">
+        DELETE FROM diet_info
+        WHERE diet_id = #{dietId}
+    </delete>
+
+</mapper>

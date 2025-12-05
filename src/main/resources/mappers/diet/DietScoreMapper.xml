@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.diet.dao.DietScoreDao">
+
+    <resultMap id="DietScoreMap" type="com.ssafy.fitmeet.domain.diet.entity.DietScore">
+        <id     property="id"        column="id"/>
+        <result property="dietId"    column="diet_id"/>
+        <result property="score"     column="score"/>
+        <result property="grade"     column="grade"/>
+        <result property="feedback"  column="feedback"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.diet.entity.DietScore" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO diet_score (
+            diet_id,
+            score,
+            grade,
+            feedback
+        ) VALUES (
+                     #{dietId},
+                     #{score},
+                     #{grade},
+                     #{feedback}
+                 )
+    </insert>
+
+    <!-- 식단 기준 조회 (1:1 관계 가정) -->
+    <select id="findByDietId" parameterType="long" resultMap="DietScoreMap">
+        SELECT *
+        FROM diet_score
+        WHERE diet_id = #{dietId}
+    </select>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.fitmeet.domain.diet.entity.DietScore">
+        UPDATE diet_score
+        SET
+            score    = #{score},
+            grade    = #{grade},
+            feedback = #{feedback}
+        WHERE diet_id = #{dietId}
+    </update>
+
+    <!-- 식단 삭제 시 점수도 같이 지우고 싶을 경우 -->
+    <delete id="deleteByDietId" parameterType="long">
+        DELETE FROM diet_score
+        WHERE diet_id = #{dietId}
+    </delete>
+
+</mapper>

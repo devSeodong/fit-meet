@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.meal.dao.MealNutritionDao">
+
+    <resultMap id="MealNutritionMap" type="com.ssafy.fitmeet.domain.meal.entity.MealNutrition">
+        <id     property="id"           column="id"/>
+        <result property="mealId"       column="meal_id"/>
+        <result property="baseAmountG"  column="base_amount_g"/>
+        <result property="kcal"         column="kcal"/>
+        <result property="carbohydrate" column="carbohydrate"/>
+        <result property="protein"      column="protein"/>
+        <result property="fat"          column="fat"/>
+        <result property="sugar"        column="sugar"/>
+        <result property="sodium"       column="sodium"/>
+        <result property="dietaryFiber" column="dietary_fiber"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="updatedAt"    column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.meal.entity.MealNutrition"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meal_nutrition (
+            meal_id,
+            base_amount_g,
+            kcal,
+            carbohydrate,
+            protein,
+            fat,
+            sugar,
+            sodium,
+            dietary_fiber
+        ) VALUES (
+                     #{mealId},
+                     #{baseAmountG},
+                     #{kcal},
+                     #{carbohydrate},
+                     #{protein},
+                     #{fat},
+                     #{sugar},
+                     #{sodium},
+                     #{dietaryFiber}
+                 )
+    </insert>
+
+    <!-- 단건 조회: meal_id -->
+    <select id="findByMealId" resultMap="MealNutritionMap">
+        SELECT
+            id,
+            meal_id,
+            base_amount_g,
+            kcal,
+            carbohydrate,
+            protein,
+            fat,
+            sugar,
+            sodium,
+            dietary_fiber,
+            created_at,
+            updated_at
+        FROM meal_nutrition
+        WHERE meal_id = #{mealId}
+    </select>
+
+</mapper>

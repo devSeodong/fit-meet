@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.meal.dao.MealDao">
+
+    <resultMap id="MealMap" type="com.ssafy.fitmeet.domain.meal.entity.Meal">
+        <id     property="id"           column="id"/>
+        <result property="foodCd"       column="food_cd"/>
+        <result property="foodNmKr"     column="food_nm_kr"/>
+        <result property="dbGrpCm"      column="db_grp_cm"/>
+        <result property="dbGrpNm"      column="db_grp_nm"/>
+        <result property="foodCat1Cd"   column="food_cat1_cd"/>
+        <result property="foodCat1Nm"   column="food_cat1_nm"/>
+        <result property="foodCat2Cd"   column="food_cat2_cd"/>
+        <result property="foodCat2Nm"   column="food_cat2_nm"/>
+        <result property="foodCat3Cd"   column="food_cat3_cd"/>
+        <result property="foodCat3Nm"   column="food_cat3_nm"/>
+        <result property="servingSizeRaw" column="serving_size_raw"/>
+        <result property="sourceType"   column="source_type"/>
+        <result property="category"     column="category"/>
+        <result property="brand"        column="brand"/>
+        <result property="tags"         column="tags"/>
+        <result property="updateDate"   column="update_date"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="updatedAt"    column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.meal.entity.Meal"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meal (
+            food_cd,
+            food_nm_kr,
+            db_grp_cm,
+            db_grp_nm,
+            food_cat1_cd,
+            food_cat1_nm,
+            food_cat2_cd,
+            food_cat2_nm,
+            food_cat3_cd,
+            food_cat3_nm,
+            serving_size_raw,
+            source_type,
+            category,
+            brand,
+            tags,
+            update_date
+        ) VALUES (
+                     #{foodCd},
+                     #{foodNmKr},
+                     #{dbGrpCm},
+                     #{dbGrpNm},
+                     #{foodCat1Cd},
+                     #{foodCat1Nm},
+                     #{foodCat2Cd},
+                     #{foodCat2Nm},
+                     #{foodCat3Cd},
+                     #{foodCat3Nm},
+                     #{servingSizeRaw},
+                     #{sourceType},
+                     #{category},
+                     #{brand},
+                     #{tags},
+                     #{updateDate}
+                 )
+    </insert>
+
+    <!-- 단건 조회: id -->
+    <select id="findById" resultMap="MealMap">
+        SELECT
+            id,
+            food_cd,
+            food_nm_kr,
+            db_grp_cm,
+            db_grp_nm,
+            food_cat1_cd,
+            food_cat1_nm,
+            food_cat2_cd,
+            food_cat2_nm,
+            food_cat3_cd,
+            food_cat3_nm,
+            serving_size_raw,
+            source_type,
+            category,
+            brand,
+            tags,
+            update_date,
+            created_at,
+            updated_at
+        FROM meal
+        WHERE id = #{id}
+    </select>
+
+    <!-- 단건 조회: food_cd -->
+    <select id="findByFoodCd" resultMap="MealMap">
+        SELECT
+            id,
+            food_cd,
+            food_nm_kr,
+            db_grp_cm,
+            db_grp_nm,
+            food_cat1_cd,
+            food_cat1_nm,
+            food_cat2_cd,
+            food_cat2_nm,
+            food_cat3_cd,
+            food_cat3_nm,
+            serving_size_raw,
+            source_type,
+            category,
+            brand,
+            tags,
+            update_date,
+            created_at,
+            updated_at
+        FROM meal
+        WHERE food_cd = #{foodCd}
+    </select>
+
+    <!-- 검색: 키워드 + 카테고리 -->
+    <select id="searchByKeyword" resultMap="MealMap">
+        SELECT
+        id,
+        food_cd,
+        food_nm_kr,
+        db_grp_cm,
+        db_grp_nm,
+        food_cat1_cd,
+        food_cat1_nm,
+        food_cat2_cd,
+        food_cat2_nm,
+        food_cat3_cd,
+        food_cat3_nm,
+        serving_size_raw,
+        source_type,
+        category,
+        brand,
+        tags,
+        update_date,
+        created_at,
+        updated_at
+        FROM meal
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND food_nm_kr LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        ORDER BY food_nm_kr ASC
+        LIMIT 100
+    </select>
+
+</mapper>

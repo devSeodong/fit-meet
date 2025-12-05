@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.fitmeet.domain.diet.dao.DietDao">
+    <resultMap id="DietMap" type="com.ssafy.fitmeet.domain.diet.entity.Diet">
+        <id     property="id"                 column="id"/>
+        <result property="userId"             column="user_id"/>
+        <result property="date"               column="date"/>
+        <result property="mealType"           column="meal_type"/>
+        <result property="description"        column="description"/>
+        <result property="imageUrl"           column="image_url"/>
+        <result property="sourceType"         column="source_type"/>
+
+        <result property="totalKcal"          column="total_kcal"/>
+        <result property="totalCarbohydrate"  column="total_carbohydrate"/>
+        <result property="totalProtein"       column="total_protein"/>
+        <result property="totalFat"           column="total_fat"/>
+        <result property="totalSugar"         column="total_sugar"/>
+        <result property="totalSodium"        column="total_sodium"/>
+
+        <result property="isPublic"           column="is_public"/>
+
+        <result property="createdAt"          column="created_at"/>
+        <result property="updatedAt"          column="updated_at"/>
+        <result property="deletedAt"          column="deleted_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.fitmeet.domain.diet.entity.Diet" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO diet (
+            user_id,
+            `date`,
+            meal_type,
+            description,
+            image_url,
+            source_type,
+            total_kcal,
+            total_carbohydrate,
+            total_protein,
+            total_fat,
+            total_sugar,
+            total_sodium,
+            is_public
+        ) VALUES (
+                     #{userId},
+                     #{date},
+                     #{mealType},
+                     #{description},
+                     #{imageUrl},
+                     #{sourceType},
+                     #{totalKcal},
+                     #{totalCarbohydrate},
+                     #{totalProtein},
+                     #{totalFat},
+                     #{totalSugar},
+                     #{totalSodium},
+                     #{isPublic}
+                 )
+    </insert>
+
+    <!-- 단건 조회 -->
+    <select id="findById" parameterType="long" resultMap="DietMap">
+        SELECT *
+        FROM diet
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </select>
+
+    <!-- 유저 + 날짜 범위 조회 (캘린더용) -->
+    <select id="findByUserAndDateRange" resultMap="DietMap">
+        SELECT *
+        FROM diet
+        WHERE user_id = #{userId}
+        AND `date` >= #{startDate}
+        AND `date` &lt;  #{endDate}
+        AND deleted_at IS NULL
+        ORDER BY `date` ASC
+    </select>
+
+    <!-- 유저 + 특정 날짜(하루) 전체 식단 조회 -->
+    <select id="findByUserAndLocalDate" resultMap="DietMap">
+        SELECT *
+        FROM diet
+        WHERE user_id = #{userId}
+          AND DATE(`date`) = #{localDate}
+          AND deleted_at IS NULL
+        ORDER BY `date` ASC
+    </select>
+
+    <!-- 유저 + 특정 날짜(하루) + 식사 타입 조회 -->
+    <select id="findByUserAndDateAndMealType" resultMap="DietMap">
+        SELECT *
+        FROM diet
+        WHERE user_id = #{userId}
+          AND DATE(`date`) = DATE(#{date})
+          AND meal_type = #{mealType}
+          AND deleted_at IS NULL
+    </select>
+
+    <!-- UPDATE (메모/이미지/요약 정보 수정 등) -->
+    <update id="update" parameterType="com.ssafy.fitmeet.domain.diet.entity.Diet">
+        UPDATE diet
+        SET
+            meal_type          = #{mealType},
+            description        = #{description},
+            image_url          = #{imageUrl},
+            source_type        = #{sourceType},
+            total_kcal         = #{totalKcal},
+            total_carbohydrate = #{totalCarbohydrate},
+            total_protein      = #{totalProtein},
+            total_fat          = #{totalFat},
+            total_sugar        = #{totalSugar},
+            total_sodium       = #{totalSodium},
+            is_public          = #{isPublic}
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 소프트 삭제 -->
+    <update id="softDelete" parameterType="long">
+        UPDATE diet
+        SET deleted_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 완전 삭제 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM diet
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

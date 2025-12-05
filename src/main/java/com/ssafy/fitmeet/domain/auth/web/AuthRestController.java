@@ -81,7 +81,7 @@ public class AuthRestController {
 				.from("REFRESH_TOKEN", loginRes.refreshToken())
 				.httpOnly(true)
 				.secure(cookieProps.isSecure())
-				.path("/api/auth")
+				.path("/")
 				.maxAge(1209600)
 				.sameSite(cookieProps.getSameSite())
 				.build();
@@ -129,7 +129,7 @@ public class AuthRestController {
 
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
-		return ResponseEntity.ok(ResponseUtil.ok("새로고침 완료 !"));
+		return ResponseEntity.ok(ResponseUtil.ok("새로고침 완료 !", null));
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public class AuthRestController {
 		ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
 				.httpOnly(true)
 				.secure(cookieProps.isSecure())
-				.path("/api/auth")
+				.path("/")
 				.maxAge(0)
 				.sameSite(cookieProps.getSameSite())
 				.build();
@@ -164,6 +164,6 @@ public class AuthRestController {
 		response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		return ResponseEntity.ok(ResponseUtil.ok("로그아웃 완료 !"));
+		return ResponseEntity.ok(ResponseUtil.ok("로그아웃 완료 !", null));
 	}
 }

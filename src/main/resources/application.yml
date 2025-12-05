@@ -36,7 +36,7 @@ server:
   port: 9090
 
 jwt:
-  secret: "fitmeettsttestesttest1235test54345346testestestest"
+  secret: "fitmeettsttestesttest1235test546testesttest"
   access-token-validity-in-ms: 3600000
   refresh-token-validity-in-ms: 1209600000
   

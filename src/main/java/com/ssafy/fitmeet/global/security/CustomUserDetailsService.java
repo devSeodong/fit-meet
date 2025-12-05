@@ -37,15 +37,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> authorities =
                 List.of(new SimpleGrantedAuthority(user.getRole()));
 
-        // Spring Security에서 사용하는 UserDetails 구현체 반환
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),          // username
-                user.getPassword(),       // password
-                true,                     // enabled
-                true,                     // accountNonExpired
-                true,                     // credentialsNonExpired
-                true,                     // accountNonLocked
-                authorities               // 권한 목록
-        );
+        return new CustomUserDetails(user, authorities);
     }
 }
